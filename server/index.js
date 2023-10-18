@@ -8,7 +8,7 @@ const { User } = require('./models/User');
 
 dotenv.config();
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -24,6 +24,10 @@ mongoose
   .catch(err => console.error(err));
 
 app.get('/', (req, res) => res.send('Hello World!'));
+
+app.get('/api/hello', (req,res) => {
+  res.send('안녕하세요 ~')
+})
 
 app.post('/api/users/register', (req, res) => {
   const user = new User(req.body);
@@ -82,6 +86,18 @@ app.get('/api/users/auth', auth , (req,res) => {
     image : req.user.image,
   })
 
+})
+
+app.get('/api/users/logout', auth, (req,res) => {
+  User.findOneAndUpdate({_id: req.user._id}, {token: ""})
+  .then(() => {
+    return res.status(200).send({
+      success:true
+    })
+  })
+  .catch((err) => {
+    return res.json({success:false, err});
+  })
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
